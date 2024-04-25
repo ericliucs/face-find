@@ -1,6 +1,6 @@
 function Navigation() {
   return <nav className={"flex justify-end"}>
-    <button className={"px-4 py-2 rounded-lg bg-slate-900 align-middle text-xl transition duration-100" +
+    <button className={"mx-4 my-8 px-2 rounded-lg bg-slate-900 align-middle text-xl transition duration-100" +
       " hover:bg-slate-800"}>Sign Out</button>
   </nav>;
 }
