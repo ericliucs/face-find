@@ -1,6 +1,6 @@
 #image-link-form {
   --tw-bg-opacity: 1;
-  /* Taken from https://css-pattern.com/ */
+  /* Taken from https://css-pattern.com/, colors changed */
   --s: 200px; /* control the size */
   --c1: rgb(66 80 100 / var(--tw-bg-opacity));
   --c2: rgb(10 18 37 / var(--tw-bg-opacity));
