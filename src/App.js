@@ -1,6 +1,7 @@
 import ImageLinkForm from "./components/logo/ImageLinkForm";
 import Logo from "./components/logo/Logo";
 import Navigation from "./components/navigation/Navigation";
+import Rank from "./components/rank/Rank";
 
 function App() {
   return <div id={"app"} className={"app"}>
@@ -9,6 +10,7 @@ function App() {
       <Navigation />
     </div>
     <div className={"flex flex-col justify-center items-center"}>
+      <Rank />
       <ImageLinkForm />
     </div>
   </div>;

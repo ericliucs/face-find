@@ -2,9 +2,9 @@
   --tw-bg-opacity: 1;
   /* Taken from https://css-pattern.com/ */
   --s: 200px; /* control the size */
-  --c1: rgb(71 85 105 / var(--tw-bg-opacity));
-  --c2: rgb(15 23 42 / var(--tw-bg-opacity));
-  --c3: rgb(100 116 139 / var(--tw-bg-opacity));
+  --c1: rgb(66 80 100 / var(--tw-bg-opacity));
+  --c2: rgb(10 18 37 / var(--tw-bg-opacity));
+  --c3: rgb(95 111 134 / var(--tw-bg-opacity));
   background:
           repeating-conic-gradient(from 30deg,#0000 0 120deg,var(--c3) 0 180deg)
           calc(.5*var(--s)) calc(.5*var(--s)*0.577),
