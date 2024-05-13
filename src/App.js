@@ -85,6 +85,7 @@ function App() {
   const [init, setInit] = useState(false);
   const [input, setInput] = useState("");
   const [imageURL, setImageURL] = useState("");
+  const [faceBox, setFaceBox] = useState({});
 
   useEffect(() => {
     initParticlesEngine(async (engine) => {
@@ -105,9 +106,12 @@ function App() {
       fetch(`https://api.clarifai.com/v2/models/${MODEL_ID}/outputs`, requestOptions)
         .then(response => response.json())
         .then(result => {
-          createBoundingBoxesFromRegions(result.outputs[0].data.regions);
+          createBoundingBoxesFromRegions(result.outputs[0].data.regions, 4);
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+          console.log(error);
+          setFaceBox({});
+        });
     }
   }
 
@@ -148,23 +152,41 @@ function App() {
     };
   }
 
-  function createBoundingBoxesFromRegions(regions) {
+  function createBoundingBoxesFromRegions(regions, precisionDigits) {
+    setFaceBox(calculateFaceLocation(regions[0].region_info.bounding_box));
     regions.forEach(region => {
       // Accessing and rounding the bounding box values
       const boundingBox = region.region_info.bounding_box;
-      const topRow = boundingBox.top_row.toFixed(3);
-      const leftCol = boundingBox.left_col.toFixed(3);
-      const bottomRow = boundingBox.bottom_row.toFixed(3);
-      const rightCol = boundingBox.right_col.toFixed(3);
+      const topRow = boundingBox.top_row.toFixed(precisionDigits);
+      const leftCol = boundingBox.left_col.toFixed(precisionDigits);
+      const bottomRow = boundingBox.bottom_row.toFixed(precisionDigits);
+      const rightCol = boundingBox.right_col.toFixed(precisionDigits);
 
       region.data.concepts.forEach(concept => {
         // Accessing and rounding the concept value
         const name = concept.name;
         const value = concept.value.toFixed(4);
 
-        console.log(`${name}: ${value} BBox: ${topRow}, ${leftCol}, ${bottomRow}, ${rightCol}`);
+        // console.log(`${name}: ${value} BBox: ${topRow}, ${leftCol}, ${bottomRow}, ${rightCol}`);
       });
     });
+  }
+
+  function calculateFaceLocation(boundingBox) {
+    const image = document.getElementById("input-image");
+    const imageWidth = Number(image.width);
+    const imageHeight = Number(image.height);
+    const imageRect = image.getBoundingClientRect();
+
+    return {
+      topRow: boundingBox.top_row * imageHeight + imageRect.y,
+      leftColumn: boundingBox.left_col * imageWidth + imageRect.x,
+      // bottomRow: imageHeight - (boundingBox.bottom_row * imageHeight),
+      bottomRow: (document.documentElement.scrollHeight - imageRect.bottom) + imageHeight
+        - (boundingBox.bottom_row * imageHeight),
+      rightColumn: (document.documentElement.scrollWidth- imageRect.right) + imageWidth
+        - (boundingBox.right_col * imageWidth)
+    };
   }
 
   return <div id={"app"} className={"app"}>
@@ -176,7 +198,7 @@ function App() {
     </div>
     <div className={"flex flex-col justify-center items-center"}>
       <Rank />
-      <ImageLinkForm onInputChange={onInputChange} onSubmit={onSubmit} imageURL={imageURL}/>
+      <ImageLinkForm onInputChange={onInputChange} onSubmit={onSubmit} imageURL={imageURL} faceBox={faceBox}/>
     </div>
   </div>;
 }
