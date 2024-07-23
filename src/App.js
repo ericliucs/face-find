@@ -1,7 +1,8 @@
-import ImageLinkForm from "./components/logo/ImageLinkForm";
+import ImageLinkForm from "./components/image-link-form/ImageLinkForm";
 import Logo from "./components/logo/Logo";
 import Navigation from "./components/navigation/Navigation";
 import Rank from "./components/rank/Rank";
+import Credentials from "./components/sign-in/Credentials";
 import { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
@@ -11,13 +12,13 @@ const USER_ID = "ericliu";
 const APP_ID = "ztm-face-find";
 const MODEL_ID = 'face-detection';
 
-const particlesOptions = {
+const particlesOptions= {
   background: {
     color: {
       value: "#000000",
     },
   },
-  fpsLimit: 144,
+  fpsLimit: 120,
   interactivity: {
     events: {
       onClick: {
@@ -25,7 +26,7 @@ const particlesOptions = {
         mode: "push",
       },
       onHover: {
-        enable: true,
+        enable: false,
         mode: "repulse",
       },
       resize: true,
@@ -86,6 +87,7 @@ function App() {
   const [input, setInput] = useState("");
   const [imageURL, setImageURL] = useState("");
   const [faceBox, setFaceBox] = useState({});
+  const [route, setRoute] = useState("sign-in");
 
   useEffect(() => {
     initParticlesEngine(async (engine) => {
@@ -94,6 +96,18 @@ function App() {
       setInit(true);
     });
   }, []);
+
+  function register() {
+    setRoute(route === "register" ? "face-find" : "register");
+  }
+
+  function signIn() {
+    setRoute("face-find");
+  }
+
+  function signOut() {
+    setRoute("sign-in");
+  }
 
   function onInputChange(event) {
     setInput(event.target.value);
@@ -166,8 +180,6 @@ function App() {
         // Accessing and rounding the concept value
         const name = concept.name;
         const value = concept.value.toFixed(4);
-
-        // console.log(`${name}: ${value} BBox: ${topRow}, ${leftCol}, ${bottomRow}, ${rightCol}`);
       });
     });
   }
@@ -190,16 +202,20 @@ function App() {
   }
 
   return <div id={"app"} className={"app"}>
-    {init &&
-      <Particles id="tsparticles" options={particlesOptions} className={"fixed -z-50"}/>}
-    <div id={"navbar"} className={"flex justify-between text-center"}>
+    {init && <Particles id="tsparticles" options={particlesOptions} className={"fixed -z-50"}/>}
+
+    <div id={"navbar"} className={"m-4 gap-y-1 flex flex-wrap justify-between text-center"}>
       <Logo />
-      <Navigation />
+      {route === "face-find" && <Navigation signOut={signOut}/>}
     </div>
-    <div className={"flex flex-col justify-center items-center"}>
-      <Rank />
-      <ImageLinkForm onInputChange={onInputChange} onSubmit={onSubmit} imageURL={imageURL} faceBox={faceBox}/>
-    </div>
+
+    {route === "sign-in" || route === "register"
+      ? <Credentials onSignIn={signIn} onRegister={register} route={route} />
+      : <div className={"flex flex-col justify-center items-center"}>
+          <Rank/>
+          <ImageLinkForm onInputChange={onInputChange} onSubmit={onSubmit} imageURL={imageURL} faceBox={faceBox}/>
+        </div>
+    }
   </div>;
 }
 

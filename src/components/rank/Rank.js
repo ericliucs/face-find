@@ -1,5 +1,5 @@
 function Rank() {
-  return <div id={"rank"} className={"mt-24 flex flex-col justify-center items-center"}>
+  return <div id={"rank"} className={"mt-24 m-2 flex flex-col justify-center items-center font-bold"}>
     <div className={"text-2xl"}>
       {"Altern, your current rank is..."}
     </div>
