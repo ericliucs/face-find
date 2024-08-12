@@ -1,8 +1,10 @@
 "use strict"
 import bcryptjs from "bcryptjs"
+import cors from "cors"
 import express from "express";
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 const mockDatabase = {
@@ -11,7 +13,7 @@ const mockDatabase = {
       id: 1,
       name: "John Doe",
       email: "john@example.com",
-      password: "cookie",
+      password: "cookies",
       entries: 0,
       joined: new Date()
     },
@@ -32,10 +34,6 @@ const mockDatabase = {
     }
   ]
 };
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-})
 
 app.get("/profile/:id", (req, res) => {
   const id = parseInt(req.params.id);
@@ -71,7 +69,7 @@ app.post("/signin", (req, res) => {
     }
   }
   if (!foundUser) {
-    res.status(400).send("Credentials denied");
+    res.status(400).json("Credentials denied");
   }
 });
 

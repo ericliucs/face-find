@@ -1,4 +1,37 @@
-function Credentials({ onSignIn, onRegister, route }) {
+import { useState } from "react";
+
+function Credentials({ route, setRoute }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  function onEmailChange(event) {
+    setEmail(event.target.value);
+  }
+
+  function onPasswordChange(event) {
+    setPassword(event.target.value);
+  }
+
+  async function signIn() {
+    console.log("signing in", email, password);
+    const response = await fetch("http://localhost:8080/signin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    if (response.status === 200) {
+      setRoute("app");
+    }
+    const json = await response.json();
+    console.log(json);
+  }
+
+  function register() {
+    console.log("register", email, password);
+  }
+
   // Modified code from https://tailwindui.com/components/application-ui/forms/sign-in-forms
   return (
     <div className="mt-24 px-4 lg:px-8 flex min-h-full flex-1 flex-col justify-center ">
@@ -43,6 +76,7 @@ function Credentials({ onSignIn, onRegister, route }) {
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset
                 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-500
                 sm:text-sm sm:leading-6"
+                onChange={onEmailChange}
               />
             </div>
           </div>
@@ -68,6 +102,7 @@ function Credentials({ onSignIn, onRegister, route }) {
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset
                 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-slate-500 sm:text-sm
                 sm:leading-6"
+                onChange={onPasswordChange}
               />
             </div>
           </div>
@@ -79,7 +114,7 @@ function Credentials({ onSignIn, onRegister, route }) {
                 className="flex w-full justify-center rounded-md bg-slate-800 px-3 py-1.5 text-sm font-semibold leading-6
             text-white shadow-sm hover:bg-slate-700 focus-visible:outline focus-visible:outline-2
             focus-visible:outline-offset-2 focus-visible:outline-slate-500"
-                onClick={onSignIn}
+                onClick={signIn}
               >
                 Sign in
               </button>
@@ -92,7 +127,7 @@ function Credentials({ onSignIn, onRegister, route }) {
               className="flex w-full justify-center rounded-md bg-slate-800 px-3 py-1.5 text-sm font-semibold leading-6
             text-white shadow-sm hover:bg-slate-700 focus-visible:outline focus-visible:outline-2
             focus-visible:outline-offset-2 focus-visible:outline-slate-500"
-              onClick={onRegister}
+              onClick={register}
             >
               Register
             </button>

@@ -97,14 +97,6 @@ function App() {
     });
   }, []);
 
-  function register() {
-    setRoute(route === "register" ? "face-find" : "register");
-  }
-
-  function signIn() {
-    setRoute("face-find");
-  }
-
   function signOut() {
     setRoute("sign-in");
   }
@@ -210,7 +202,7 @@ function App() {
     </div>
 
     {route === "sign-in" || route === "register"
-      ? <Credentials onSignIn={signIn} onRegister={register} route={route} />
+      ? <Credentials route={route} setRoute={setRoute} />
       : <div className={"flex flex-col justify-center items-center"}>
           <Rank/>
           <ImageLinkForm onInputChange={onInputChange} onSubmit={onSubmit} imageURL={imageURL} faceBox={faceBox}/>
