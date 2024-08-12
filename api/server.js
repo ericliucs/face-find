@@ -1,3 +1,5 @@
+"use strict"
+import bcryptjs from "bcryptjs"
 import express from "express";
 
 const app = express();
@@ -21,6 +23,13 @@ const mockDatabase = {
       entries: 0,
       joined: new Date()
     }
+  ],
+  login: [
+    {
+      id: 3,
+      hash: "",
+      email: "hash@example.com"
+    }
   ]
 };
 
@@ -28,8 +37,26 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 })
 
+app.get("/profile/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  let foundUser = false;
+  for (const user of mockDatabase.users) {
+    if (user.id === id) {
+      res.send(user);
+      foundUser = true;
+      break;
+    }
+  }
+  if (!foundUser) {
+    res.status(404).send("User not found");
+  }
+});
+
 app.post("/register", (req, res) => {
-  mockDatabase.users.push(createNewUser(req.body));
+  const newUser = createNewUser(req.body);
+  if (newUser) {
+    mockDatabase.users.push();
+  }
   console.log(mockDatabase.users);
   res.json("Created user");
 });
@@ -45,6 +72,22 @@ app.post("/signin", (req, res) => {
   }
   if (!foundUser) {
     res.status(400).send("Credentials denied");
+  }
+});
+
+app.post("/image", (req, res) => {
+  const id = parseInt(req.body.id);
+  let foundUser = false;
+  for (const user of mockDatabase.users) {
+    if (user.id === id) {
+      user.entries++;
+      res.json(user.entries);
+      foundUser = true;
+      break;
+    }
+  }
+  if (!foundUser) {
+    res.status(404).send("User not found");
   }
 });
 
