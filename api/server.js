@@ -53,7 +53,7 @@ app.get("/profile/:id", (req, res) => {
 app.post("/register", (req, res) => {
   const newUser = createNewUser(req.body);
   if (newUser) {
-    mockDatabase.users.push();
+    mockDatabase.users.push(newUser);
   }
   console.log(mockDatabase.users);
   res.json("Created user");
@@ -63,7 +63,7 @@ app.post("/signin", (req, res) => {
   let foundUser = false;
   for (const user of mockDatabase.users) {
     if (user.email === req.body.email && user.password === req.body.password) {
-      res.json(`Success! Logged in as ${user.name}`);
+      res.json(user);
       foundUser = true;
       break;
     }

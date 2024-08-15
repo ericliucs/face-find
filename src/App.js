@@ -7,10 +7,12 @@ import { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 
-const PAT = "962ec416fa3349cd82ea135769ae4fcb";
-const USER_ID = "ericliu";
-const APP_ID = "ztm-face-find";
-const MODEL_ID = 'face-detection';
+const apiCredentials = {
+  PAT: "962ec416fa3349cd82ea135769ae4fcb",
+  userID: "ericliu",
+  appID: "ztm-face-find",
+  modelID: 'face-detection',
+};
 
 const particlesOptions= {
   background: {
@@ -84,10 +86,8 @@ const particlesOptions= {
 
 function App() {
   const [init, setInit] = useState(false);
-  const [input, setInput] = useState("");
-  const [imageURL, setImageURL] = useState("");
-  const [faceBox, setFaceBox] = useState({});
   const [route, setRoute] = useState("sign-in");
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     initParticlesEngine(async (engine) => {
@@ -97,115 +97,19 @@ function App() {
     });
   }, []);
 
-  function signOut() {
-    setRoute("sign-in");
-  }
-
-  function onInputChange(event) {
-    setInput(event.target.value);
-  }
-
-  async function onSubmit() {
-    if (input.length > 0 && await checkURLForOK(input)) {
-      setImageURL(input);
-      const requestOptions = createRequestOptions();
-      fetch(`https://api.clarifai.com/v2/models/${MODEL_ID}/outputs`, requestOptions)
-        .then(response => response.json())
-        .then(result => {
-          createBoundingBoxesFromRegions(result.outputs[0].data.regions, 4);
-        })
-        .catch(error => {
-          console.log(error);
-          setFaceBox({});
-        });
-    }
-  }
-
-  async function checkURLForOK(input) {
-    try {
-      const response = await fetch(new URL(input));
-      return response.ok;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  function createRequestOptions() {
-    const body = JSON.stringify({
-      user_app_id: {
-        user_id: USER_ID,
-        app_id: APP_ID
-      },
-      inputs: [
-        {
-          data: {
-            image: {
-              //url: "https://samples.clarifai.com/metro-north.jpg"
-              url: input
-            }
-          }
-        }
-      ]
-    });
-
-    return {
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Key " + PAT
-      },
-      body: body
-    };
-  }
-
-  function createBoundingBoxesFromRegions(regions, precisionDigits) {
-    setFaceBox(calculateFaceLocation(regions[0].region_info.bounding_box));
-    regions.forEach(region => {
-      // Accessing and rounding the bounding box values
-      const boundingBox = region.region_info.bounding_box;
-      const topRow = boundingBox.top_row.toFixed(precisionDigits);
-      const leftCol = boundingBox.left_col.toFixed(precisionDigits);
-      const bottomRow = boundingBox.bottom_row.toFixed(precisionDigits);
-      const rightCol = boundingBox.right_col.toFixed(precisionDigits);
-
-      region.data.concepts.forEach(concept => {
-        // Accessing and rounding the concept value
-        const name = concept.name;
-        const value = concept.value.toFixed(4);
-      });
-    });
-  }
-
-  function calculateFaceLocation(boundingBox) {
-    const image = document.getElementById("input-image");
-    const imageWidth = Number(image.width);
-    const imageHeight = Number(image.height);
-    const imageRect = image.getBoundingClientRect();
-
-    return {
-      topRow: boundingBox.top_row * imageHeight + imageRect.y,
-      leftColumn: boundingBox.left_col * imageWidth + imageRect.x,
-      // bottomRow: imageHeight - (boundingBox.bottom_row * imageHeight),
-      bottomRow: (document.documentElement.scrollHeight - imageRect.bottom) + imageHeight
-        - (boundingBox.bottom_row * imageHeight),
-      rightColumn: (document.documentElement.scrollWidth- imageRect.right) + imageWidth
-        - (boundingBox.right_col * imageWidth)
-    };
-  }
-
   return <div id={"app"} className={"app"}>
     {init && <Particles id="tsparticles" options={particlesOptions} className={"fixed -z-50"}/>}
 
     <div id={"navbar"} className={"m-4 gap-y-1 flex flex-wrap justify-between text-center"}>
       <Logo />
-      {route === "face-find" && <Navigation signOut={signOut}/>}
+      {route === "face-find" && <Navigation setRoute={setRoute} setUser={setUser} />}
     </div>
 
     {route === "sign-in" || route === "register"
-      ? <Credentials route={route} setRoute={setRoute} />
+      ? <Credentials route={route} setRoute={setRoute} setUser={setUser}/>
       : <div className={"flex flex-col justify-center items-center"}>
-          <Rank/>
-          <ImageLinkForm onInputChange={onInputChange} onSubmit={onSubmit} imageURL={imageURL} faceBox={faceBox}/>
+          <Rank user={user}/>
+          <ImageLinkForm apiCredentials={apiCredentials} user={user} setUser={setUser}/>
         </div>
     }
   </div>;
