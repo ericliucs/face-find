@@ -18,7 +18,6 @@ function Credentials({ route, setRoute, setUser }) {
   }
 
   async function signIn() {
-    console.log("signing in", email, password);
     const response = await fetch("http://localhost:8080/signin", {
       method: "POST",
       headers: {
@@ -31,6 +30,7 @@ function Credentials({ route, setRoute, setUser }) {
       setUser(userJson);
       setRoute("face-find");
     }
+    // TODO Create error message for bad sign-ins
   }
 
   function showRegistration() {
@@ -38,7 +38,6 @@ function Credentials({ route, setRoute, setUser }) {
   }
 
   async function registerNewUser() {
-    console.log("registering", email, password);
     const response = await fetch("http://localhost:8080/register", {
       method: "POST",
       headers: {
@@ -46,11 +45,11 @@ function Credentials({ route, setRoute, setUser }) {
       },
       body: JSON.stringify({ name, email, password }),
     });
+    const user = await response.json();
     if (response.status === 200) {
       setRoute("face-find");
+      setUser(user);
     }
-    const json = await response.json();
-    console.log(json);
   }
 
   // Modified code from https://tailwindui.com/components/application-ui/forms/sign-in-forms

@@ -33,12 +33,20 @@ function ImageLinkForm({ apiCredentials, user, setUser }) {
     const image = document.getElementById("input-image");
     const imageWidth = Number(image.width);
     const imageHeight = Number(image.height);
-    const imageRect = image.getBoundingClientRect();
+    let imageRect = image.getBoundingClientRect();
+
+    console.log({
+      topRow: boundingBox.top_row * imageHeight + imageRect.y,
+      leftColumn: boundingBox.left_col * imageWidth + imageRect.x,
+      bottomRow: (document.documentElement.scrollHeight - imageRect.bottom) + imageHeight
+          - (boundingBox.bottom_row * imageHeight),
+      rightColumn: (document.documentElement.scrollWidth- imageRect.right) + imageWidth
+          - (boundingBox.right_col * imageWidth)
+    });
 
     return {
       topRow: boundingBox.top_row * imageHeight + imageRect.y,
       leftColumn: boundingBox.left_col * imageWidth + imageRect.x,
-      // bottomRow: imageHeight - (boundingBox.bottom_row * imageHeight),
       bottomRow: (document.documentElement.scrollHeight - imageRect.bottom) + imageHeight
         - (boundingBox.bottom_row * imageHeight),
       rightColumn: (document.documentElement.scrollWidth- imageRect.right) + imageWidth
@@ -100,6 +108,7 @@ function ImageLinkForm({ apiCredentials, user, setUser }) {
     return {
       method: "POST",
       headers: {
+        "Access-Control-Allow-Origin": "*",
         "Accept": "application/json",
         "Authorization": "Key " + apiCredentials.PAT
       },
